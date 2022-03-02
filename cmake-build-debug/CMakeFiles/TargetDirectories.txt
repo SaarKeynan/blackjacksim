@@ -1,0 +1,3 @@
+C:/Users/Saar Keynan/CLionProjects/cppbj/cmake-build-debug/CMakeFiles/cppbj.dir
+C:/Users/Saar Keynan/CLionProjects/cppbj/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Saar Keynan/CLionProjects/cppbj/cmake-build-debug/CMakeFiles/rebuild_cache.dir

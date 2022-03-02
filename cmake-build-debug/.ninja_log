@@ -1,0 +1,11 @@
+# ninja log v5
+0	275	6676965781634697	CMakeFiles/cppbj.dir/Hand.cpp.obj	3baa8b876f7d59af
+1	183	6679279437762727	build.ninja	1c2f45bd7334d7a
+0	663	6675088375213826	CMakeFiles/cppbj.dir/main.cpp.obj	a1de3181f4a56c4
+12	548	6676144415655172	CMakeFiles/cppbj.dir/List.cpp.obj	7d87db31b78fa7c0
+250	1075	6679277160178387	cppbj.exe	8c2850457f99cd68
+0	249	6679277153655010	CMakeFiles/cppbj.dir/Game.cpp.obj	b7d896dde3841004
+1	572	6679276929834675	CMakeFiles/cppbj.dir/Player.cpp.obj	e19fc80e7879eae6
+11	219	6679282504343367	CMakeFiles/cppbj.dir/Condition.cpp.obj	4bfd58dbb192d6
+1	368	6679282505823391	CMakeFiles/cppbj.dir/main.cpp.obj	a1de3181f4a56c4
+368	791	6679282509093397	cppbj.exe	8206e18385b8c6e7
