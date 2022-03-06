@@ -7,21 +7,21 @@
 
 ConditionObject::ConditionObject(std::string name, void *object, ConditionObjType type) {
 	this->name = name;
-	this->m_Object = object;
-    this->m_Type = type;
+	this->object = object;
+    this->type = type;
 }
 
 bool ConditionObject::evaluate(ConditionObject other, CmpType comparison) {
-    if(m_Type != other.m_Type) {
+    if(type != other.type) {
         return comparison == NEQ;
     }
-    switch(m_Type) {
+    switch(type) {
         case BOOLEAN: {
             switch (comparison) {
                 case EQ:
-                    return *(bool *) m_Object == *(bool *) other.m_Object;
+                    return *(bool *)object == *(bool *) other.object;
                 case NEQ:
-                    return *(bool *)m_Object != *(bool *) other.m_Object;
+                    return *(bool *)object != *(bool *) other.object;
                 default:
                     return false;
             }
@@ -29,25 +29,25 @@ bool ConditionObject::evaluate(ConditionObject other, CmpType comparison) {
         case NUMBER: {
             switch (comparison) {
                 case EQ:
-                    return *(double *)m_Object == *(double *) other.m_Object;
+                    return *(double *)object == *(double *) other.object;
                 case NEQ:
-                    return *(double *)m_Object != *(double *) other.m_Object;
+                    return *(double *)object != *(double *) other.object;
                 case GT:
-                    return *(double *)m_Object > *(double *) other.m_Object;
+                    return *(double *)object > *(double *) other.object;
                 case LT:
-                    return *(double *)m_Object < *(double *) other.m_Object;
+                    return *(double *)object < *(double *) other.object;
                 case GEQ:
-                    return *(double *)m_Object >= *(double *) other.m_Object;
+                    return *(double *)object >= *(double *) other.object;
                 case LEQ:
-                    return *(double *)m_Object <= *(double *) other.m_Object;
+                    return *(double *)object <= *(double *) other.object;
             }
         }
         case CONDITION: {
             switch (comparison) {
                 case EQ:
-                    return (*(Condition *)m_Object).evaluate() == (*(Condition *)other.m_Object).evaluate();
+                    return (*(Condition *)object).evaluate() == (*(Condition *)other.object).evaluate();
                 case NEQ:
-                    return (*(Condition *)m_Object).evaluate() != (*(Condition*)other.m_Object).evaluate();
+                    return (*(Condition *)object).evaluate() != (*(Condition*)other.object).evaluate();
                 default:
                     return false;
             }

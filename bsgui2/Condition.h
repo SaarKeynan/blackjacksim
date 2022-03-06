@@ -14,6 +14,7 @@ class Condition {
     CmpType m_Comparison;
     public:
         bool evaluate();
+		char *toString(ConditionObject objects[], int size);
 };
 
 #endif //CPPBJ_CONDITION_H

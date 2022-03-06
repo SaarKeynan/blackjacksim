@@ -11,10 +11,11 @@
 #include "Condition.h"
 
 class ConditionObject {
-	std::string name;
-    void *m_Object;
-    ConditionObjType m_Type;
 public:
+	void* object;
+	std::string name;
+	ConditionObjType type;
+
     ConditionObject(std::string name, void *object, ConditionObjType type);
     bool evaluate(ConditionObject other, CmpType comparison);
 };
