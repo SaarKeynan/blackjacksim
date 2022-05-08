@@ -17,6 +17,12 @@ std::string BSTable::toString(ConditionObject *globals, int length) {
 	return str;
 }
 
+Move BSTable::decide(Hand hand, Card dealer) {
+	int column = dealer.rank == ACE ? 9 : dealer.value()-2;
+	int row = hand.value().value + offset;
+	return table[getIndex(row, column)].decide(objects);
+}
+
 int BSTable::getIndex(int row, int col) {
 	return row * this->colNum + col;
 }

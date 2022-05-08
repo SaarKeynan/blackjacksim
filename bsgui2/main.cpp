@@ -19,7 +19,7 @@
 #include "ConditionObject.h"
 #include "Condition.h"
 #include "BSTable.h"
-
+#include "Globals.h"
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -35,6 +35,24 @@ static void glfw_error_callback(int error, const char* description)
 void makeTable(int rowStart, int rowEnd, std::string idStart, char* table);
 char* printTable(char* table, int lastIndex);
 void setTable(char* table, char* values, int size);
+
+bool FALSE = false, TRUE = true;
+
+Rules gameRules = Rules();
+
+ConditionObject objects[] = {
+		{"False", &FALSE, BOOLEAN},
+		{"True", &TRUE, BOOLEAN},
+		{"Split Aces", &gameRules.SPLIT_ACES, BOOLEAN},
+		{"Play after split aces", &gameRules.PLAY_AFTER_SPLIT_ACES, BOOLEAN},
+		{"Resplit aces", &gameRules.RESPLIT_ACES, BOOLEAN},
+		{"Surrender", &gameRules.SURRENDER, BOOLEAN},
+		{"DAS", &gameRules.DOUBLE_AFTER_SPLIT, BOOLEAN},
+		{"Double amount", &gameRules.DOUBLE_AMOUNT, NUMBER},
+		{"Resplit amount", &gameRules.RESPLIT_AMOUNT, NUMBER},
+		{"Blackjack ratio", &gameRules.BLACKJACK_RATIO, NUMBER},
+		{"Deck penetration", &gameRules.DECK_PENETRATION, NUMBER}
+};
 
 int main(int, char**)
 {
@@ -92,21 +110,6 @@ int main(int, char**)
 	char defSvt[81] = "DDDDDDDHHHHHHHHDDHHHHHHHHDDDHHHHHHHDDDHHHHHHHDDDDHHHHSSDDDDDSSSSSDSSSSSSSSSSSSSS";
 	char defSplit[101] = "NNNNYYYYYYNNNNYYYYYYNNNNNYYNNNNNNNNNNNNNNNNNNYYYYYNNNNYYYYYYYYYYYYYYYYNNYYNYYYYYNNNNNNNNNNYYYYYYYYYY";
 	char defSurr[171] = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNYNNNNNNNNYYYNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
-	bool FALSE = false, TRUE = true;
-	Rules gameRules = Rules();
-	ConditionObject objects[] = {
-		{"False", &FALSE, BOOLEAN},
-		{"True", &TRUE, BOOLEAN},
-		{"Split Aces", &gameRules.SPLIT_ACES, BOOLEAN},
-		{"Play after split aces", &gameRules.PLAY_AFTER_SPLIT_ACES, BOOLEAN},
-		{"Resplit aces", &gameRules.RESPLIT_ACES, BOOLEAN},
-		{"Surrender", &gameRules.SURRENDER, BOOLEAN},
-		{"DAS", &gameRules.DOUBLE_AFTER_SPLIT, BOOLEAN},
-		{"Double amount", &gameRules.DOUBLE_AMOUNT, NUMBER},
-		{"Resplit amount", &gameRules.RESPLIT_AMOUNT, NUMBER},
-		{"Blackjack ratio", &gameRules.BLACKJACK_RATIO, NUMBER},
-		{"Deck penetration", &gameRules.DECK_PENETRATION, NUMBER}
-	};
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{

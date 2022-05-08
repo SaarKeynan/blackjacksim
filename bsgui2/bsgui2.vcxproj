@@ -174,7 +174,9 @@
     <ClInclude Include="ConditionObject.h" />
     <ClInclude Include="ConditionObjType.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Hand.h" />
+    <ClInclude Include="HandValue.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_glfw.h" />

@@ -9,17 +9,17 @@ Hand::Hand(double bet) {
     this->bet = bet;
 }
 
-int Hand::value() {
+HandValue Hand::value() {
     int value = 0;
     bool ace = false;
     for (int i = 0; i < this->cards.size; i++) {
         value += this->cards.get(i).value();
         if(this->cards.get(i).value() == 1) {
-            ace = true;
+			ace = true;
         }
     }
-    if(value <= 11 && ace) {
-        value += 10;
+	if (value <= 11 && ace) {
+		return HandValue(value + 10, true);
     }
-    return value;
+    return HandValue(value, true);
 }

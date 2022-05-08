@@ -9,6 +9,7 @@
 #include "Card.h"
 #include "Move.h"
 #include "Status.h"
+#include "HandValue.h"
 
 class Hand {
 public:
@@ -16,7 +17,7 @@ public:
     double bet;
     Status status;
     Hand(double bet);
-    int value();
+    HandValue value();
 };
 
 
