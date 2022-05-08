@@ -18,6 +18,7 @@
 #include "Rules.h"
 #include "ConditionObject.h"
 #include "Condition.h"
+#include "BSTable.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -30,9 +31,8 @@ static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
-using namespace std;
 
-void makeTable(int rowStart, int rowEnd, string idStart, char* table);
+void makeTable(int rowStart, int rowEnd, std::string idStart, char* table);
 char* printTable(char* table, int lastIndex);
 void setTable(char* table, char* values, int size);
 
@@ -84,10 +84,10 @@ int main(int, char**)
 	bool basic_strategy_window = true;
 	bool run_sim_window = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	char *hardValueTable = (char*)calloc(17 * 10 * 2, 1);
-	char *softValueTable = (char*)calloc(10 * 8 * 2, 1);
-	char *splitTable = (char*)calloc(10 * 10 * 2, 1);
-	char *surrenderTable = (char *)calloc(17 * 10 * 2, 1);
+	char* hardValueTable = (char*)calloc(17 * 10 * 2, 1);
+	char* softValueTable = (char*)calloc(10 * 8 * 2, 1);
+	char* splitTable = (char*)calloc(10 * 10 * 2, 1);
+	char* surrenderTable = (char*)calloc(17 * 10 * 2, 1);
 	char defHvt[171] = "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHDDDDHHHHHDDDDDDDDHHDDDDDDDDDDHHSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS";
 	char defSvt[81] = "DDDDDDDHHHHHHHHDDHHHHHHHHDDDHHHHHHHDDDHHHHHHHDDDDHHHHSSDDDDDSSSSSDSSSSSSSSSSSSSS";
 	char defSplit[101] = "NNNNYYYYYYNNNNYYYYYYNNNNNYYNNNNNNNNNNNNNNNNNNYYYYYNNNNYYYYYYYYYYYYYYYYNNYYNYYYYYNNNNNNNNNNYYYYYYYYYY";
@@ -117,20 +117,20 @@ int main(int, char**)
 		ImGui::NewFrame();
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 		ImGui::ShowDemoWindow(&show_demo_window);
-		static ImVec2 cell_padding(0.0f, 0.0f); 
+		static ImVec2 cell_padding(0.0f, 0.0f);
 		{
 			ImGui::Begin("Simulation Window", &run_sim_window);
 			ImGui::Checkbox("Split aces", &gameRules.SPLIT_ACES);
 			if (gameRules.SPLIT_ACES) {
 				ImGui::Checkbox("Play after split aces", &gameRules.PLAY_AFTER_SPLIT_ACES);
-				if (gameRules.PLAY_AFTER_SPLIT_ACES) { 
-					ImGui::Checkbox("Resplit aces", &gameRules.RESPLIT_ACES); 
+				if (gameRules.PLAY_AFTER_SPLIT_ACES) {
+					ImGui::Checkbox("Resplit aces", &gameRules.RESPLIT_ACES);
 				}
 			}
 			ImGui::Checkbox("DAS", &gameRules.DOUBLE_AFTER_SPLIT);
 			ImGui::Checkbox("Surrender", &gameRules.SURRENDER);
 			if (ImGui::Button("Run Simulation")) {
-				
+
 			}
 			ImGui::End();
 		}
@@ -156,7 +156,29 @@ int main(int, char**)
 				char* svt = printTable(softValueTable, 10 * 8);
 				char* split = printTable(splitTable, 10 * 10);
 				char* surrTable = printTable(surrenderTable, 17 * 10);
-				printf("Hard Values: %s\nSoft Values: %s\nSplit: %s\nSurrender: %s", hvt, svt, split, surrTable);
+				//printf("Hard Values: %s\nSoft Values: %s\nSplit: %s\nSurrender: %s", hvt, svt, split, surrTable);
+				Condition* cond = (Condition*)malloc(sizeof(Condition));
+				*cond = Condition(1, 1, CmpType::EQ);
+				Move* moves = (Move*)malloc(sizeof(Move) * 10 * 17);
+				BSTableCell* cells;
+				cells = (BSTableCell*)malloc(sizeof(BSTableCell)* 170);
+				if (cells == nullptr) {
+					break;
+				}
+				//BSTableCell temp = BSTableCell(cond, moves, 1);
+				//std::cout << temp.getCount() << "\n";
+				for (int i = 0; i < 17; i++) {
+					for (int j = 0; j < 10; j++) {
+						switch (hardValueTable[(i * 10 + j)*2]) {
+						case 'D': {moves[i * 10 + j] = DOUBLE; } break;
+						case 'H': {moves[i * 10 + j] = HIT; } break;
+						default: {moves[i * 10 + j] = STAND; } break;
+						}
+						cells[i * 10 + j] = BSTableCell(cond, (moves + (j + i * 10)), 1);;
+					}
+				}
+				BSTable table = BSTable(cells, 17, 10);
+				std::cout << table.toString(objects, 11) << "\n";
 			}
 			if (ImGui::Button("Set to default")) {
 				setTable(hardValueTable, defHvt, 10 * 17);
@@ -200,10 +222,10 @@ int main(int, char**)
 	return 0;
 }
 
-char *printTable(char* table, int size) {
+char* printTable(char* table, int size) {
 	char* fixed = (char*)calloc(size, 1);
 	int runningIndex = 0;
-	for (int i = 0; i < size*2; i += 2) {
+	for (int i = 0; i < size * 2; i += 2) {
 		if (!isalpha(table[i])) {
 			fixed[runningIndex++] = ' ';
 		}
@@ -215,7 +237,7 @@ char *printTable(char* table, int size) {
 	return fixed;
 }
 
-void makeTable(int rowStart, int rowEnd, string idStart, char *table) {
+void makeTable(int rowStart, int rowEnd, std::string idStart, char* table) {
 	int id;
 	ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
 	for (int i = 2; i < 12; i++) {
@@ -228,7 +250,7 @@ void makeTable(int rowStart, int rowEnd, string idStart, char *table) {
 		for (int j = 2; j < 12; j++) {
 			ImGui::TableNextColumn();
 			ImGui::SetNextItemWidth(20.0f);
-			id = (i - rowStart-1) * 10 + j-2;
+			id = (i - rowStart - 1) * 10 + j - 2;
 			ImGui::InputText((idStart + std::to_string(id)).c_str(), table + id * 2, 2, ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AlwaysOverwrite);
 		}
 	}

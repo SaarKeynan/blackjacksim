@@ -148,7 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\CLionProjects\cppbj\BSTableCell.cpp" />
+    <ClCompile Include="BSTableCell.cpp" />
     <ClCompile Include="BSTable.cpp" />
     <ClCompile Include="Condition.cpp" />
     <ClCompile Include="ConditionObject.cpp" />
@@ -166,7 +166,7 @@
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\CLionProjects\cppbj\BSTableCell.h" />
+    <ClInclude Include="BSTableCell.h" />
     <ClInclude Include="BSTable.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="CmpType.h" />

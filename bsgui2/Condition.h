@@ -11,14 +11,14 @@
 class ConditionObject;
 
 class Condition {
-    ConditionObject *m_FirstCond;
-    ConditionObject *m_SecondCond;
+    int m_FirstCond;
+    int m_SecondCond;
     CmpType m_Comparison;
     public:
-		Condition(ConditionObject* firstObj, ConditionObject* secondObj, CmpType comparison);
-        bool evaluate();
+		std::string toString();
+		bool evaluate(ConditionObject objects[]);
+		Condition(int firstObj, int secondObj, CmpType comparison);
 		Condition fromString(std::string str, ConditionObject objects[]);
-		char *toString(ConditionObject objects[], int size);
 };
 
 #endif //CPPBJ_CONDITION_H

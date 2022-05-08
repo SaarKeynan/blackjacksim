@@ -42,15 +42,5 @@ bool ConditionObject::evaluate(ConditionObject other, CmpType comparison) {
                     return *(double *)object <= *(double *) other.object;
             }
         }
-        case CONDITION: {
-            switch (comparison) {
-                case EQ:
-                    return (*(Condition *)object).evaluate() == (*(Condition *)other.object).evaluate();
-                case NEQ:
-                    return (*(Condition *)object).evaluate() != (*(Condition*)other.object).evaluate();
-                default:
-                    return false;
-            }
-        }
     }
 }

@@ -8,7 +8,6 @@
 #include <string>
 #include "ConditionObjType.h"
 #include "CmpType.h"
-#include "Condition.h"
 
 class ConditionObject {
 public:
