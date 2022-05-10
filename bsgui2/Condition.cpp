@@ -15,7 +15,6 @@ std::string Condition::toString() {
 	int length = snprintf(NULL, 0, "{%d,%d,%d}", m_FirstCond, m_SecondCond, m_Comparison) + 1;
 	char* str = (char*)malloc(length);
 	sprintf_s(str, length, "{%d,%d,%d}", m_FirstCond, m_SecondCond, m_Comparison);
-	//printf("aaaaa\n%s\n", str);
 	return std::string(str);
 }
 

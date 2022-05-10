@@ -8,15 +8,20 @@
 #include "Rules.h"
 #include "Card.h"
 #include "List.h"
+#include "BSTable.h"
 #include <cstdlib>
 
 class Player;
+
 class Game {
     Rules rules;
     List<Card> deck;
     List<Player> players;
+	BSTable splitTable;
+	BSTable softTable;
+	BSTable hardTable;
     public:
-        Game(Rules rules);
+		Game(Rules rules);
         Card drawCard();
 };
 

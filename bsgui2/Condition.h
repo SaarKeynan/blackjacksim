@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "CmpType.h"
+#include "Globals.h"
 
 class ConditionObject;
 

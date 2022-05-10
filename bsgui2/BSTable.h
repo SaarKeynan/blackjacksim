@@ -4,16 +4,20 @@
 #include "ConditionObject.h"
 #include "Hand.h"
 #include "Globals.h"
+#include <functional>
 
 class BSTable {
-	int offset; //offset of value-index.
 	int rowNum;
 	int colNum;
+	std::function<int(int)> rowMatch; //converts sum into rows
 	BSTableCell *table;
 	int getIndex(int col, int row);
 public:
+	BSTable();
+	BSTable(BSTableCell* cells, int row, int col, std::function<int(int)> rowMatch);
+	BSTable(int row, int col, std::function<int(int)> rowMatch);
 	std::string toString(ConditionObject *globals, int length);
-	BSTable(BSTableCell *cells, int row, int col);
+	void setTable(BSTableCell* cells);
 	Move decide(Hand hand, Card dealer);
 };
 

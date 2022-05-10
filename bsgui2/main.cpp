@@ -20,6 +20,8 @@
 #include "Condition.h"
 #include "BSTable.h"
 #include "Globals.h"
+#include "InputTable.h"
+
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -35,6 +37,7 @@ static void glfw_error_callback(int error, const char* description)
 void makeTable(int rowStart, int rowEnd, std::string idStart, char* table);
 char* printTable(char* table, int lastIndex);
 void setTable(char* table, char* values, int size);
+BSTable convertTableByDefaults(InputTable table, std::function<int(int)> rowMatch);
 
 bool FALSE = false, TRUE = true;
 
@@ -102,14 +105,15 @@ int main(int, char**)
 	bool basic_strategy_window = true;
 	bool run_sim_window = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	char* hardValueTable = (char*)calloc(17 * 10 * 2, 1);
-	char* softValueTable = (char*)calloc(10 * 8 * 2, 1);
-	char* splitTable = (char*)calloc(10 * 10 * 2, 1);
-	char* surrenderTable = (char*)calloc(17 * 10 * 2, 1);
-	char defHvt[171] = "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHDDDDHHHHHDDDDDDDDHHDDDDDDDDDDHHSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS";
-	char defSvt[81] = "DDDDDDDHHHHHHHHDDHHHHHHHHDDDHHHHHHHDDDHHHHHHHDDDDHHHHSSDDDDDSSSSSDSSSSSSSSSSSSSS";
-	char defSplit[101] = "NNNNYYYYYYNNNNYYYYYYNNNNNYYNNNNNNNNNNNNNNNNNNYYYYYNNNNYYYYYYYYYYYYYYYYNNYYNYYYYYNNNNNNNNNNYYYYYYYYYY";
-	char defSurr[171] = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNYNNNNNNNNYYYNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+	char* defHvt = (char*)malloc(181);
+	strcpy_s(defHvt, 181, "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHDDDDHHHHHDDDDDDDDHHDDDDDDDDDDHHSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSHHHHHSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+	char* defSvt = (char*)malloc(81);
+	strcpy_s(defSvt, 81, "HHHDDHHHHHHHHDDHHHHHHHDDDHHHHHHHDDDHHHHHHDDDDHHHHHDDDDDSSHHHSSSSDSSSSSSSSSSSSSSS");
+	char *defSplit = (char*)malloc(101);
+	strcpy_s(defSplit, 101, "NNNNYYYYYYNNNNYYYYYYNNNNNYYNNNNNNNNNNNNNNNNNNYYYYYNNNNYYYYYYYYYYYYYYYYNNYYNYYYYYNNNNNNNNNNYYYYYYYYYY");
+	InputTable hvt = InputTable(18, 10, [](int a) {return std::to_string(a); }, defHvt);
+	InputTable svt = InputTable(9, 10, [](int a) {return std::to_string(a); }, defSvt);
+	InputTable split = InputTable(10, 10, [](int a) {std::string str = "("; str.append(std::to_string(a / 2)); str.append(", "); str.append(std::to_string(a / 2)); str.append(")"); return str; }, defSplit);
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -143,51 +147,30 @@ int main(int, char**)
 
 			ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
 			if (ImGui::BeginTable("Hard Totals", 11, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_NoPadInnerX)) {
-				makeTable(3, 20, "##hard", hardValueTable);
+				makeTable(2, 20, "##hard", hvt.table);
 			}
 			ImGui::SameLine();
 			if (ImGui::BeginTable("Soft Totals", 11, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_NoPadInnerX)) {
-				makeTable(12, 20, "##soft", softValueTable);
+				makeTable(12, 20, "##soft", svt.table);
 			}
 			ImGui::SameLine();
 			if (ImGui::BeginTable("Split", 11, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInner | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_NoPadInnerX)) {
-				makeTable(2, 11, "##split", splitTable);
+				makeTable(2, 11, "##split", split.table);
 			}
 			ImGui::PopStyleVar();
 			if (ImGui::Button("Print")) {
-				char* hvt = printTable(hardValueTable, 17 * 10);
-				char* svt = printTable(softValueTable, 10 * 8);
-				char* split = printTable(splitTable, 10 * 10);
-				char* surrTable = printTable(surrenderTable, 17 * 10);
-				//printf("Hard Values: %s\nSoft Values: %s\nSplit: %s\nSurrender: %s", hvt, svt, split, surrTable);
-				Condition* cond = (Condition*)malloc(sizeof(Condition));
-				*cond = Condition(1, 1, CmpType::EQ);
-				Move* moves = (Move*)malloc(sizeof(Move) * 10 * 17);
-				BSTableCell* cells;
-				cells = (BSTableCell*)malloc(sizeof(BSTableCell)* 170);
-				if (cells == nullptr) {
-					break;
-				}
-				//BSTableCell temp = BSTableCell(cond, moves, 1);
-				//std::cout << temp.getCount() << "\n";
-				for (int i = 0; i < 17; i++) {
-					for (int j = 0; j < 10; j++) {
-						switch (hardValueTable[(i * 10 + j)*2]) {
-						case 'D': {moves[i * 10 + j] = DOUBLE; } break;
-						case 'H': {moves[i * 10 + j] = HIT; } break;
-						default: {moves[i * 10 + j] = STAND; } break;
-						}
-						cells[i * 10 + j] = BSTableCell(cond, (moves + (j + i * 10)), 1);;
-					}
-				}
-				BSTable table = BSTable(cells, 17, 10);
-				std::cout << table.toString(objects, 11) << "\n";
+				char* svtStr = printTable(svt.table, 9 * 10);
+				printf("%s\n", svtStr);
+				//char* surrTable = printTable(surrenderTable, 17 * 10); [](int a) {std::string str = "(A, "; str.append(std::to_string(a - 11)); str.append(")"); return str; }
+				convertTableByDefaults(hvt, [](int a) {return a-3;});
+				convertTableByDefaults(svt, [](int a) { return a - 13; });
+				convertTableByDefaults(split, [](int a) { return a / 2; });
+				//std::cout << table.toString(objects, 11) << "\n";
 			}
 			if (ImGui::Button("Set to default")) {
-				setTable(hardValueTable, defHvt, 10 * 17);
-				setTable(softValueTable, defSvt, 10 * 8);
-				setTable(splitTable, defSplit, 10 * 10);
-				setTable(surrenderTable, defSurr, 10 * 17);
+				setTable(hvt.table, defHvt, 10 * 18);
+				setTable(svt.table, defSvt, 10 * 9);
+				setTable(split.table, defSplit, 10 * 10);
 			}
 			ImGui::End();
 		}
@@ -243,13 +226,18 @@ char* printTable(char* table, int size) {
 void makeTable(int rowStart, int rowEnd, std::string idStart, char* table) {
 	int id;
 	ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
-	for (int i = 2; i < 12; i++) {
-		ImGui::TableSetupColumn(std::to_string(i).c_str(), ImGuiTableColumnFlags_WidthFixed);
+	for (int i = 2; i < 12; i++) { //setting column names
+		if (i == 11) {
+			ImGui::TableSetupColumn("A", ImGuiTableColumnFlags_WidthFixed);
+		}
+		else {
+			ImGui::TableSetupColumn(std::to_string(i).c_str(), ImGuiTableColumnFlags_WidthFixed);
+		}
 	}
 	ImGui::TableHeadersRow();
 	for (int i = rowEnd; i > rowStart; i--) {
 		ImGui::TableNextColumn();
-		ImGui::Text("%d", i);
+		ImGui::Text("%d", i); //setting row names
 		for (int j = 2; j < 12; j++) {
 			ImGui::TableNextColumn();
 			ImGui::SetNextItemWidth(20.0f);
@@ -265,4 +253,24 @@ void setTable(char* table, char* values, int size) {
 		table[i] = values[i / 2];
 		table[i + 1] = '\0';
 	}
+}
+
+BSTable convertTableByDefaults(InputTable table, std::function<int(int)> rowMatch) {
+	Condition* cond = (Condition*)malloc(sizeof(Condition));
+	*cond = Condition(1, 1, CmpType::EQ);
+	Move* moves = (Move*)malloc(sizeof(Move) * 10 * 17);
+	BSTableCell* cells;
+	cells = (BSTableCell*)malloc(sizeof(BSTableCell) * 170);
+	for (int i = 0; i < table.rowNum; i++) {
+		for (int j = 0; j < table.colNum; j++) {
+			switch (table.table[(i * table.colNum + j) * COND_NAME_LEN]) {
+			case 'D': {moves[i * table.colNum + j] = DOUBLE; } break;
+			case 'H': {moves[i * table.colNum + j] = HIT; } break;
+			default: {moves[i * table.colNum + j] = STAND; } break;
+			}
+			cells[i * table.colNum + j] = BSTableCell(cond, (moves + (j + i * table.colNum)), 1);
+		}
+	}
+	BSTable bsTable = BSTable(cells, table.rowNum, table.colNum, rowMatch);
+	return bsTable;
 }

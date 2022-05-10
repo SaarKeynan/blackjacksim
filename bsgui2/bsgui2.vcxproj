@@ -186,6 +186,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="InputTable.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="Player.h" />
